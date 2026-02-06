@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Boa Interface</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e1e5eb;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .card-change {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .positive {
+            color: #27ae60;
+        }
+        
+        .negative {
+            color: #e74c3c;
+        }
+        
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .data-table th {
+            background-color: #f8f9fa;
+            text-align: left;
+            padding: 12px 15px;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 2px solid #e1e5eb;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e1e5eb;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 1px solid #e1e5eb;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #5a6c7d;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .filter-btn:hover:not(.active) {
+            background-color: #f8f9fa;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5eb;
+            color: #95a5a6;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dashboard de Vendas</h1>
+            <p class="subtitle">Visão geral do desempenho de vendas | Dados atualizados em tempo real</p>
+        </header>
+        
+        <div class="filters">
+            <button class="filter-btn active" onclick="setFilter('today')">Hoje</button>
+            <button class="filter-btn" onclick="setFilter('week')">Esta Semana</button>
+            <button class="filter-btn" onclick="setFilter('month')">Este Mês</button>
+            <button class="filter-btn" onclick="setFilter('quarter')">Este Trimestre</button>
+            <button class="filter-btn" onclick="setFilter('year')">Este Ano</button>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Vendas Totais</div>
+                    <div class="card-change positive">↑ 12.5%</div>
+                </div>
+                <div class="card-value">R$ 254.680</div>
+                <p>Em relação ao período anterior</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Pedidos Realizados</div>
+                    <div class="card-change positive">↑ 8.2%</div>
+                </div>
+                <div class="card-value">1.247</div>
+                <p>Número total de pedidos</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Ticket Médio</div>
+                    <div class="card-change positive">↑ 4.1%</div>
+                </div>
+                <div class="card-value">R$ 204,30</div>
+                <p>Valor médio por pedido</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Clientes Ativos</div>
+                    <div class="card-change negative">↓ 2.3%</div>
+                </div>
+                <div class="card-value">892</div>
+                <p>Clientes com compras no período</p>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="card" style="grid-column: span 2;">
+                <div class="card-header">
+                    <div class="card-title">Vendas por Categoria</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Top Produtos</div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Vendas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Smartphone X9</td>
+                            <td>R$ 42.850</td>
+                        </tr>
+                        <tr>
+                            <td>Notebook Pro</td>
+                            <td>R$ 38.420</td>
+                        </tr>
+                        <tr>
+                            <td>Fone Bluetooth</td>
+                            <td>R$ 21.340</td>
+                        </tr>
+                        <tr>
+                            <td>Tablet Lite</td>
+                            <td>R$ 19.760</td>
+                        </tr>
+                        <tr>
+                            <td>Smartwatch 4</td>
+                            <td>R$ 17.550</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Vendas por Região</div>
+            </div>
+            <div class="chart-container">
+                <canvas id="regionChart"></canvas>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Dashboard de Vendas • Atualizado em tempo real • Dados confidenciais</p>
+        </footer>
+    </div>
+
+    <script>
+        // Dados para os gráficos
+        const categoryData = {
+            labels: ['Eletrônicos', 'Roupas', 'Livros', 'Alimentos', 'Móveis', 'Esportes'],
+            datasets: [{
+                label: 'Vendas (R$)',
+                data: [85420, 42350, 18740, 32480, 45630, 28960],
+                backgroundColor: [
+                    '#3498db', '#2ecc71', '#9b59b6', '#e74c3c', '#f39c12', '#1abc9c'
+                ],
+                borderWidth: 1
+            }]
+        };
+        
+        const regionData = {
+            labels: ['Sudeste', 'Sul', 'Nordeste', 'Centro-Oeste', 'Norte'],
+            datasets: [{
+                label: 'Vendas por Região (R$)',
+                data: [125430, 87450, 65210, 42350, 28740],
+                backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                borderColor: '#2980b9',
+                borderWidth: 2
+            }]
+        };
+        
+        // Inicializar gráficos
+        window.onload = function() {
+            // Gráfico de categorias (pizza)
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(categoryCtx, {
+                type: 'pie',
+                data: categoryData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de regiões (barras)
+            const regionCtx = document.getElementById('regionChart').getContext('2d');
+            new Chart(regionCtx, {
+                type: 'bar',
+                data: regionData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        };
+        
+        // Função para alternar filtros
+        function setFilter(filter) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Simulação de mudança de dados
+            const cards = document.querySelectorAll('.card-value');
+            if (filter === 'today') {
+                cards[0].textContent = 'R$ 12.540';
+                cards[1].textContent = '89';
+                cards[2].textContent = 'R$ 140,90';
+                cards[3].textContent = '76';
+            } else if (filter === 'week') {
+                cards[0].textContent = 'R$ 87.420';
+                cards[1].textContent = '425';
+                cards[2].textContent = 'R$ 205,70';
+                cards[3].textContent = '312';
+            } else if (filter === 'month') {
+                cards[0].textContent = 'R$ 254.680';
+                cards[1].textContent = '1.247';
+                cards[2].textContent = 'R$ 204,30';
+                cards[3].textContent = '892';
+            } else if (filter === 'quarter') {
+                cards[0].textContent = 'R$ 742.150';
+                cards[1].textContent = '3.642';
+                cards[2].textContent = 'R$ 203,80';
+                cards[3].textContent = '2.478';
+            } else {
+                cards[0].textContent = 'R$ 3.125.430';
+                cards[1].textContent = '15.247';
+                cards[2].textContent = 'R$ 205,10';
+                cards[3].textContent = '10.892';
+            }
+        }
+    </script>
+</body>
+</html>

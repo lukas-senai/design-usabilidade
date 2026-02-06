@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA DE VENDAS - PAINEL CONTROLE</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS completamente bagunçado e inconsistente */
+        * { margin: 2px; padding: 1px; font-family: "Times New Roman", serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #000033 0%, #660066 50%, #003300 100%);
+            color: #000000; 
+            font-size: 11px;
+            padding: 5px;
+        }
+        
+        /* Cabeçalho confuso */
+        .topo {
+            background-color: #FFFFCC;
+            border: 5px double #FF0000;
+            padding: 8px 15px;
+            margin: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .titulo-principal {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0000FF;
+            /* text-shadow: 3px 3px 0px #FF0000; */
+        }
+        
+        .data-hora {
+            font-size: 14px;
+            color: #008800;
+            background: #FFFFFF;
+            padding: 5px;
+            border: 2px solid #000000;
+        }
+        
+        /* Container principal desorganizado */
+        .conteudo-principal {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        /* Coluna esquerda sobrecarregada */
+        .coluna-esquerda {
+            width: 65%;
+            margin-right: 2%;
+        }
+        
+        /* Coluna direita desordenada */
+        .coluna-direita {
+            width: 33%;
+        }
+        
+        /* Caixas de métricas com estilos inconsistentes */
+        .caixa-metrica {
+            background: #FFFFFF;
+            border: 3px solid;
+            padding: 10px;
+            margin-bottom: 15px;
+            float: left;
+            width: 48%;
+            margin-right: 2%;
+            min-height: 120px;
+        }
+        
+        .caixa-metrica:nth-child(odd) {
+            border-color: #FF6600;
+            background: #FFF0F0;
+        }
+        
+        .caixa-metrica:nth-child(even) {
+            border-color: #0066CC;
+            background: #F0F8FF;
+        }
+        
+        .titulo-metrica {
+            font-weight: bold;
+            font-size: 13px;
+            color: #990000;
+            border-bottom: 1px dotted #000000;
+            padding-bottom: 3px;
+            margin-bottom: 8px;
+        }
+        
+        .valor-metrica {
+            font-size: 28px;
+            font-weight: bold;
+            color: #000000;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        /* Gráficos sobrepostos */
+        .area-graficos {
+            background: #FFFFFF;
+            border: 4px ridge #CCCCCC;
+            padding: 15px;
+            margin-top: 20px;
+            clear: both;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .grafico-container {
+            height: 220px;
+            width: 49%;
+            display: inline-block;
+            margin-right: 1%;
+            border: 2px solid #999999;
+            padding: 8px;
+            background: #FAFAFA;
+        }
+        
+        /* Tabela com formatação confusa */
+        .tabela-dados {
+            width: 100%;
+            background: #FFFFFF;
+            border: 3px groove #666666;
+            margin-top: 15px;
+            padding: 10px;
+        }
+        
+        .tabela-dados table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 2px;
+        }
+        
+        .tabela-dados th {
+            background: #CCCCFF;
+            color: #000066;
+            padding: 6px;
+            text-align: center;
+            border: 1px solid #000000;
+            font-size: 12px;
+        }
+        
+        .tabela-dados td {
+            background: #FFFFCC;
+            padding: 5px;
+            border: 1px dashed #666666;
+            font-size: 11px;
+        }
+        
+        .tabela-dados tr:nth-child(even) td {
+            background: #CCFFCC;
+        }
+        
+        /* Menu lateral confuso */
+        .menu-lateral {
+            background: #F5F5DC;
+            border: 3px solid #8B4513;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .item-menu {
+            background: #E6E6FA;
+            border: 2px outset #6666CC;
+            padding: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #000000;
+        }
+        
+        .item-menu:hover {
+            background: #FFE4E1;
+            border: 2px inset #FF6666;
+        }
+        
+        /* Anúncios e notificações intrusivas */
+        .anuncio {
+            background: #FFFF00;
+            border: 4px dotted #FF0000;
+            padding: 12px;
+            margin: 10px 0;
+            font-weight: bold;
+            color: #000000;
+            text-align: center;
+            animation: piscar 2s infinite;
+        }
+        
+        @keyframes piscar {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* Controles sobrecarregados */
+        .controles {
+            background: #E0FFFF;
+            border: 3px solid #008080;
+            padding: 12px;
+            margin: 10px 0;
+        }
+        
+        .botao {
+            background: linear-gradient(to bottom, #FF9999, #FF3333);
+            border: 2px outset #990000;
+            color: #FFFFFF;
+            padding: 6px 12px;
+            margin: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .botao:hover {
+            background: linear-gradient(to bottom, #FF3333, #990000);
+            border: 2px inset #660000;
+        }
+        
+        /* Pop-ups invasivos */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #FFFFFF;
+            border: 5px solid #0000FF;
+            padding: 20px;
+            z-index: 1000;
+            box-shadow: 0 0 30px #000000;
+            display: none;
+        }
+        
+        /* Rodapé poluído */
+        .rodape {
+            background: #333333;
+            color: #FFFFFF;
+            padding: 15px;
+            margin-top: 20px;
+            border-top: 5px solid #FF9900;
+            font-size: 10px;
+            text-align: center;
+        }
+        
+        /* Elementos flutuantes aleatórios */
+        .elemento-flutuante {
+            position: absolute;
+            background: #FFCCCC;
+            border: 2px solid #FF0000;
+            padding: 5px;
+            z-index: 500;
+            font-size: 10px;
+        }
+        
+        /* Campos de formulário difíceis de usar */
+        input, select {
+            border: 2px solid #666666;
+            padding: 4px;
+            margin: 3px;
+            background: #FFFFE0;
+            font-size: 11px;
+        }
+        
+        /* Estilos inline aleatórios */
+        .destaque {
+            color: #FF0000 !important;
+            font-weight: bold !important;
+            text-decoration: underline !important;
+        }
+        
+        .alerta {
+            background: #FFE4E1 !important;
+            border: 3px solid #DC143C !important;
+            animation: vibrar 0.5s infinite !important;
+        }
+        
+        @keyframes vibrar {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+            100% { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body onload="iniciarDashboard()">
+    <!-- Anúncio intrusivo -->
+    <!-- <div class="anuncio">
+        ⚠️ PROMOÇÃO RELÂMPAGO: 70% DE DESCONTO EM PRODUTOS SELECIONADOS! CLIQUE AQUI! ⚠️
+    </div> -->
+    
+    <!-- Cabeçalho confuso -->
+    <div class="topo">
+        <div>
+            <div class="titulo-principal">📊 SISTEMA DE CONTROLE DE VENDAS</div>
+            <div style="font-size: 10px; color: #666666;">Versão 4.7.2 | Última atualização: 15/10/2023</div>
+        </div>
+        <div class="data-hora" id="dataHora">Carregando...</div>
+        <div style="background: #CCFFCC; padding: 5px; border: 2px solid #008800;">
+            Usuário: ADMIN_MASTER<br>
+            <span style="color: #FF0000;">Sessão expira em: 28:14</span>
+        </div>
+    </div>
+    
+    <!-- Pop-up de boas-vindas intrusivo -->
+    <div class="popup" id="popupBoasVindas">
+        <h3 style="color: #0000FF;">BEM-VINDO AO SISTEMA!</h3>
+        <p>Você tem 3 mensagens não lidas e 5 alertas pendentes.</p>
+        <p>Deseja realizar backup dos dados agora?</p>
+        <button class="botao" onclick="fecharPopup()">SIM</button>
+        <button class="botao" onclick="fecharPopup()">NÃO</button>
+        <button class="botao" onclick="fecharPopup()">MAIS TARDE</button>
+    </div>
+    
+    <!-- Controles sobrecarregados -->
+    <div class="controles">
+        <strong>CONTROLES RÁPIDOS:</strong>
+        <button class="botao" onclick="exportarTudo()">EXPORTAR TUDO</button>
+        <button class="botao" onclick="imprimirRelatorio()">IMPRIMIR</button>
+        <button class="botao" onclick="atualizarTudo()">ATUALIZAR</button>
+        <button class="botao" onclick="mostrarConfig()">CONFIGURAÇÕES</button>
+        <button class="botao" onclick="fazerBackup()">BACKUP AGORA</button>
+        
+        <span style="margin-left: 20px;">Período:</span>
+        <select style="width: 120px;">
+            <option>HOJE</option>
+            <option>ONTEM</option>
+            <option>ESTA SEMANA</option>
+            <option>ÚLTIMOS 30 DIAS</option>
+            <option>MÊS ATUAL</option>
+            <option>ANO ATUAL</option>
+            <option>TODO O HISTÓRICO</option>
+        </select>
+        
+        <input type="date" style="width: 120px;">
+        <span>até</span>
+        <input type="date" style="width: 120px;">
+        
+        <button class="botao" style="background: linear-gradient(to bottom, #99FF99, #009900);">APLICAR</button>
+    </div>
+    
+    <div class="conteudo-principal">
+        <!-- Coluna esquerda sobrecarregada -->
+        <div class="coluna-esquerda">
+            <!-- Métricas com estilos inconsistentes -->
+            <div class="caixa-metrica">
+                <div class="titulo-metrica">💰 VENDAS BRUTAS TOTAIS</div>
+                <div class="valor-metrica">R$ 254.680,00</div>
+                <div style="text-align: center; font-size: 10px; color: #008800;">
+                    ↑ 12.5% em relação ao período anterior
+                </div>
+            </div>
+            
+            <div class="caixa-metrica" style="border: 4px dotted #FF00FF;">
+                <div class="titulo-metrica">📦 QUANT. DE PEDIDOS</div>
+                <div class="valor-metrica" style="color: #0000FF;">1.247</div>
+                <div style="text-align: center; font-size: 10px; color: #008800;">
+                    <span class="destaque">RECORDE HISTÓRICO!</span>
+                </div>
+            </div>
+            
+            <div class="caixa-metrica">
+                <div class="titulo-metrica">📉 CLIENTES ATIVOS</div>
+                <div class="valor-metrica" style="color: #FF0000;">892</div>
+                <div style="text-align: center; font-size: 10px; color: #FF0000;">
+                    ⚠️ QUEDA DE 2.3% - ATENÇÃO!
+                </div>
+            </div>
+            
+            <div class="caixa-metrica" style="background: #E6E6FA; border: 3px dashed #6666CC;">
+                <div class="titulo-metrica">📊 TICKET MÉDIO</div>
+                <div class="valor-metrica" style="color: #8B4513;">R$ 204,30</div>
+                <div style="text-align: center; font-size: 10px; color: #008800;">
+                    Crescimento de 4.1%
+                </div>
+            </div>
+            
+            <!-- Mais métricas desnecessárias -->
+            <div class="caixa-metrica" style="width: 100%; margin-top: 10px;">
+                <div class="titulo-metrica">📈 OUTRAS MÉTRICAS</div>
+                <div style="display: flex; justify-content: space-between;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 16px; font-weight: bold; color: #006600;">73%</div>
+                        <div style="font-size: 9px;">META ATINGIDA</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 16px; font-weight: bold; color: #0000CC;">R$ 18.240</div>
+                        <div style="font-size: 9px;">LUCRO LÍQUIDO</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 16px; font-weight: bold; color: #CC6600;">42</div>
+                        <div style="font-size: 9px;">NOVOS CLIENTES</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 16px; font-weight: bold; color: #990099;">7.2</div>
+                        <div style="font-size: 9px;">AVALIAÇÃO MÉDIA</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Área de gráficos sobrecarregada -->
+            <div class="area-graficos">
+                <div style="border-bottom: 2px solid #000000; margin-bottom: 10px; padding-bottom: 5px;">
+                    <span style="font-weight: bold; font-size: 16px; color: #0000FF;">GRÁFICOS E VISUALIZAÇÕES</span>
+                    <button class="botao" style="float: right; font-size: 10px;">ALTERAR VISUALIZAÇÃO</button>
+                </div>
+                
+                <div class="grafico-container">
+                    <canvas id="grafico1"></canvas>
+                    <div style="text-align: center; font-size: 10px; margin-top: 5px;">
+                        Vendas por Categoria (R$)
+                    </div>
+                </div>
+                
+                <div class="grafico-container">
+                    <canvas id="grafico2"></canvas>
+                    <div style="text-align: center; font-size: 10px; margin-top: 5px;">
+                        Vendas por Região (%)
+                    </div>
+                </div>
+                
+                <div style="clear: both; margin-top: 10px;">
+                    <div class="grafico-container" style="width: 32%;">
+                        <canvas id="grafico3"></canvas>
+                        <div style="text-align: center; font-size: 9px;">
+                            Tendência Mensal
+                        </div>
+                    </div>
+                    
+                    <div class="grafico-container" style="width: 32%;">
+                        <canvas id="grafico4"></canvas>
+                        <div style="text-align: center; font-size: 9px;">
+                            Formas de Pagamento
+                        </div>
+                    </div>
+                    
+                    <div class="grafico-container" style="width: 32%;">
+                        <canvas id="grafico5"></canvas>
+                        <div style="text-align: center; font-size: 9px;">
+                            Canais de Venda
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabela com dados excessivos -->
+            <div class="tabela-dados">
+                <div style="background: #CCCCFF; padding: 8px; border-bottom: 3px solid #000066;">
+                    <span style="font-weight: bold; font-size: 14px;">DETALHAMENTO COMPLETO DE VENDAS - OUTUBRO/2023</span>
+                    <button class="botao" style="float: right; font-size: 10px; padding: 3px 8px;">EXPANDIR</button>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>DATA</th>
+                            <th>CLIENTE</th>
+                            <th>PRODUTO</th>
+                            <th>CATEG.</th>
+                            <th>QTDE</th>
+                            <th>VALOR UN.</th>
+                            <th>DESC.</th>
+                            <th>VALOR TOTAL</th>
+                            <th>FORMA PGTO</th>
+                            <th>VENDEDOR</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaVendas">
+                        <!-- Dados carregados via JavaScript -->
+                    </tbody>
+                </table>
+                
+                <div style="text-align: center; margin-top: 10px; font-size: 10px;">
+                    Mostrando 15 de 1.247 registros | <a href="#" style="color: #0000FF;">Ver todos</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Coluna direita poluída -->
+        <div class="coluna-direita">
+            <!-- Menu lateral confuso -->
+            <div class="menu-lateral">
+                <div style="background: #8B4513; color: #FFFFFF; padding: 5px; text-align: center; font-weight: bold;">
+                    MENU PRINCIPAL
+                </div>
+                
+                <div class="item-menu">📊 Dashboard Principal</div>
+                <div class="item-menu">📈 Relatórios Avançados</div>
+                <div class="item-menu">👥 Gestão de Clientes</div>
+                <div class="item-menu">📦 Controle de Estoque</div>
+                <div class="item-menu">💰 Financeiro</div>
+                <div class="item-menu">🚚 Logística</div>
+                <div class="item-menu">📢 Marketing</div>
+                <div class="item-menu">⚙️ Configurações</div>
+                <div class="item-menu">🛠️ Ferramentas</div>
+                <div class="item-menu">📚 Ajuda e Suporte</div>
+                
+                <div style="margin-top: 15px; background: #FFE4E1; padding: 8px; border: 2px solid #FF6666;">
+                    <div style="font-weight: bold; color: #990000;">ALERTAS</div>
+                    <div style="font-size: 10px;">
+                        • 3 produtos com estoque baixo<br>
+                        • 2 pedidos pendentes<br>
+                        • Backup pendente<br>
+                        • 5 clientes inativos
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Anúncio -->
+            <!-- <div class="anuncio" style="animation: none; background: #CCFFCC;">
+                🎯 OFERTA ESPECIAL: Ganhe 15% de desconto no próximo pedido! Código: DASH15
+            </div> -->
+            
+            <!-- Informações do sistema -->
+            <div style="background: #000000; color: #00FF00; padding: 10px; border: 2px solid #00FF00; margin-top: 10px; font-family: monospace; font-size: 10px;">
+                <div style="text-align: center; font-weight: bold;">SISTEMA INFO</div>
+                <div>CPU: 47% | MEM: 68% | DISK: 83%</div>
+                <div>Usuários online: 12</div>
+                <div>Último backup: 02/10 02:00</div>
+                <div>Status: ⚠️ ALERTA</div>
+            </div>
+            
+            <!-- Notificações -->
+            <div style="background: #FFFFFF; border: 3px ridge #CCCCCC; margin-top: 15px; padding: 10px;">
+                <div style="font-weight: bold; color: #000066; border-bottom: 2px solid #CCCCCC; padding-bottom: 5px;">
+                    NOTIFICAÇÕES
+                </div>
+                
+                <div style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
+                    <div style="background: #FFF0F0; padding: 5px; margin-bottom: 5px; border-left: 3px solid #FF0000;">
+                        <div style="font-weight: bold; font-size: 10px;">15:30 - Estoque Crítico</div>
+                        <div style="font-size: 9px;">Produto "Tablet Lite" abaixo do mínimo</div>
+                    </div>
+                    
+                    <div style="background: #FFFFF0; padding: 5px; margin-bottom: 5px; border-left: 3px solid #FF9900;">
+                        <div style="font-weight: bold; font-size: 10px;">14:20 - Novo Pedido</div>
+                        <div style="font-size: 9px;">Pedido #1248 recebido - R$ 1.299,00</div>
+                    </div>
+                    
+                    <div style="background: #F0FFF0; padding: 5px; margin-bottom: 5px; border-left: 3px solid #008800;">
+                        <div style="font-weight: bold; font-size: 10px;">13:45 - Backup Concluído</div>
+                        <div style="font-size: 9px;">Backup automático realizado com sucesso</div>
+                    </div>
+                    
+                    <div style="background: #F0F8FF; padding: 5px; margin-bottom: 5px; border-left: 3px solid #0000FF;">
+                        <div style="font-weight: bold; font-size: 10px;">12:10 - Atualização</div>
+                        <div style="font-size: 9px;">Sistema atualizado para versão 4.7.2</div>
+                    </div>
+                    
+                    <div style="background: #FFF0FF; padding: 5px; margin-bottom: 5px; border-left: 3px solid #990099;">
+                        <div style="font-weight: bold; font-size: 10px;">10:30 - Novo Cliente</div>
+                        <div style="font-size: 9px;">Cliente "Tech Solutions" cadastrado</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Elemento flutuante aleatório -->
+            <div class="elemento-flutuante" style="top: 400px; right: 30px;">
+                <strong>DICA:</strong> Clique F1 para ajuda
+            </div>
+        </div>
+    </div>
+    
+    <!-- Rodapé poluído -->
+    <div class="rodape">
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                SISTEMA DE VENDAS v4.7.2 © 2023<br>
+                Desenvolvido por TI Solutions
+            </div>
+            <div>
+                Suporte: (11) 9999-8888<br>
+                Email: suporte@sistema.com
+            </div>
+            <div>
+                <span style="color: #FF9900;">⚠️ SISTEMA CRÍTICO</span><br>
+                Dados confidenciais - Não compartilhe
+            </div>
+        </div>
+        <div style="margin-top: 10px; font-size: 9px; color: #CCCCCC;">
+            Este sistema é propriedade exclusiva. Qualquer uso não autorizado é proibido por lei.
+            Todas as transações são monitoradas e auditadas.
+        </div>
+    </div>
+
+    <script>
+        // Função para iniciar a dashboard
+        function iniciarDashboard() {
+            // Mostrar pop-up intrusivo
+            setTimeout(function() {
+                document.getElementById('popupBoasVindas').style.display = 'block';
+            }, 1000);
+            
+            // Atualizar data e hora
+            atualizarDataHora();
+            setInterval(atualizarDataHora, 1000);
+            
+            // Carregar tabela de vendas
+            carregarTabelaVendas();
+            
+            // Inicializar gráficos
+            inicializarGraficos();
+            
+            // Adicionar elementos flutuantes aleatórios
+            adicionarElementosFlutuantes();
+            
+            // Iniciar notificações aleatórias
+            iniciarNotificacoesAleatorias();
+        }
+        
+        function atualizarDataHora() {
+            const agora = new Date();
+            const dataHora = agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR');
+            document.getElementById('dataHora').textContent = dataHora;
+        }
+        
+        function fecharPopup() {
+            document.getElementById('popupBoasVindas').style.display = 'none';
+        }
+        
+        function carregarTabelaVendas() {
+            const dados = [
+                {id: '1247', data: '15/10/2023', cliente: 'João Silva', produto: 'Smartphone X9', categoria: 'Eletrônico', qtde: 1, valor: 1299, desc: '0%', total: 1299, pagamento: 'Cartão', vendedor: 'Ana', status: 'Entregue'},
+                {id: '1246', data: '15/10/2023', cliente: 'Maria Santos', produto: 'Notebook Pro', categoria: 'Eletrônico', qtde: 1, valor: 3499, desc: '5%', total: 3324.05, pagamento: 'Boleto', vendedor: 'Carlos', status: 'Processando'},
+                {id: '1245', data: '14/10/2023', cliente: 'Empresa ABC', produto: 'Fone Bluetooth', categoria: 'Eletrônico', qtde: 5, valor: 189, desc: '10%', total: 850.50, pagamento: 'PIX', vendedor: 'Ana', status: 'Entregue'},
+                {id: '1244', data: '14/10/2023', cliente: 'Roberto Lima', produto: 'Tablet Lite', categoria: 'Eletrônico', qtde: 2, valor: 899, desc: '0%', total: 1798, pagamento: 'Cartão', vendedor: 'Beatriz', status: 'Transporte'},
+                {id: '1243', data: '13/10/2023', cliente: 'Cláudia Oliveira', produto: 'Smartwatch 4', categoria: 'Eletrônico', qtde: 1, valor: 459, desc: '15%', total: 390.15, pagamento: 'Cartão', vendedor: 'Carlos', status: 'Entregue'},
+                {id: '1242', data: '13/10/2023', cliente: 'Fernando Costa', produto: 'Camiseta Premium', categoria: 'Vestuário', qtde: 3, valor: 89, desc: '0%', total: 267, pagamento: 'PIX', vendedor: 'Ana', status: 'Processando'},
+                {id: '1241', data: '12/10/2023', cliente: 'Tech Solutions', produto: 'Monitor 24"', categoria: 'Eletrônico', qtde: 4, valor: 799, desc: '12%', total: 2812.48, pagamento: 'Boleto', vendedor: 'Carlos', status: 'Transporte'}
+            ];
+            
+            const tbody = document.getElementById('tabelaVendas');
+            tbody.innerHTML = '';
+            
+            dados.forEach(item => {
+                const linha = `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${item.data}</td>
+                        <td>${item.cliente}</td>
+                        <td>${item.produto}</td>
+                        <td>${item.categoria}</td>
+                        <td>${item.qtde}</td>
+                        <td>R$ ${item.valor.toFixed(2)}</td>
+                        <td>${item.desc}</td>
+                        <td>R$ ${item.total.toFixed(2)}</td>
+                        <td>${item.pagamento}</td>
+                        <td>${item.vendedor}</td>
+                        <td style="color: ${item.status === 'Entregue' ? '#008800' : item.status === 'Processando' ? '#FF9900' : '#0000FF'}">
+                            ${item.status}
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += linha;
+            });
+        }
+        
+        function inicializarGraficos() {
+            // Gráfico 1 - Vendas por categoria
+            new Chart(document.getElementById('grafico1').getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: ['Eletrônicos', 'Roupas', 'Livros', 'Alimentos', 'Outros'],
+                    datasets: [{
+                        data: [65, 15, 8, 7, 5],
+                        backgroundColor: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF']
+                    }]
+                }
+            });
+            
+            // Gráfico 2 - Vendas por região
+            new Chart(document.getElementById('grafico2').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Sudeste', 'Sul', 'Nordeste', 'Centro-Oeste', 'Norte'],
+                    datasets: [{
+                        label: 'Vendas (%)',
+                        data: [45, 25, 15, 10, 5],
+                        backgroundColor: '#FF6600'
+                    }]
+                }
+            });
+            
+            // Gráfico 3 - Tendência
+            new Chart(document.getElementById('grafico3').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out'],
+                    datasets: [{
+                        label: '2023',
+                        data: [120, 190, 300, 500, 200, 300, 400, 480, 362, 420],
+                        borderColor: '#0000FF',
+                        backgroundColor: 'rgba(0,0,255,0.1)',
+                        borderWidth: 3
+                    }]
+                }
+            });
+            
+            // Gráfico 4 - Formas de pagamento
+            new Chart(document.getElementById('grafico4').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Cartão', 'PIX', 'Boleto', 'Dinheiro'],
+                    datasets: [{
+                        data: [55, 25, 15, 5],
+                        backgroundColor: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00']
+                    }]
+                }
+            });
+            
+            // Gráfico 5 - Canais de venda
+            new Chart(document.getElementById('grafico5').getContext('2d'), {
+                type: 'polarArea',
+                data: {
+                    labels: ['Site', 'App', 'Loja', 'Telefone'],
+                    datasets: [{
+                        data: [40, 30, 25, 5],
+                        backgroundColor: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00']
+                    }]
+                }
+            });
+        }
+        
+        function adicionarElementosFlutuantes() {
+            // Adicionar mais elementos flutuantes aleatórios
+            setInterval(() => {
+                const elemento = document.createElement('div');
+                elemento.className = 'elemento-flutuante';
+                elemento.innerHTML = 'NOVA ATUALIZAÇÃO DISPONÍVEL!';
+                elemento.style.top = Math.random() * 500 + 'px';
+                elemento.style.left = Math.random() * 300 + 'px';
+                elemento.style.display = 'block';
+                
+                document.body.appendChild(elemento);
+                
+                // Remover após alguns segundos
+                setTimeout(() => {
+                    elemento.remove();
+                }, 5000);
+            }, 10000);
+        }
+        
+        function iniciarNotificacoesAleatorias() {
+            setInterval(() => {
+                const notificacoes = [
+                    "Novo pedido recebido!",
+                    "Estoque de produto atualizado",
+                    "Backup automático em andamento",
+                    "Alerta: sistema com uso elevado de CPU",
+                    "Atualização disponível para instalação"
+                ];
+                
+                const notificacao = notificacoes[Math.floor(Math.random() * notificacoes.length)];
+                
+                // Criar notificação temporária
+                const notif = document.createElement('div');
+                notif.style.position = 'fixed';
+                notif.style.bottom = '10px';
+                notif.style.right = '10px';
+                notif.style.background = '#FF9900';
+                notif.style.color = '#000000';
+                notif.style.padding = '10px';
+                notif.style.border = '3px solid #FF0000';
+                notif.style.zIndex = '9999';
+                notif.textContent = '🔔 ' + notificacao;
+                
+                document.body.appendChild(notif);
+                
+                setTimeout(() => {
+                    notif.remove();
+                }, 5000);
+            }, 15000);
+        }
+        
+        // Funções dos botões
+        function exportarTudo() {
+            alert('Exportando todos os dados... Isso pode levar alguns minutos.');
+        }
+        
+        function imprimirRelatorio() {
+            alert('Preparando relatório para impressão...');
+        }
+        
+        function atualizarTudo() {
+            location.reload();
+        }
+        
+        function mostrarConfig() {
+            alert('Abrindo configurações do sistema...');
+        }
+        
+        function fazerBackup() {
+            alert('Iniciando backup dos dados... Não desligue o sistema.');
+        }
+    </script>
+</body>
+</html>
